@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Home</title>
+  <link rel="stylesheet" href="style.css">
+
+  <script type="module" src="home.js"></script>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Bem-vindo!</h1>
+    
+    <div class="profile">
+      <img id="userAvatar" src="default.png" alt="Avatar do usuário" width="100">
+      <h2 id="userName">Usuário</h2>
+    </div>
+
+  <script type="module">
+    document.addEventListener('DOMContentLoaded', () => {
+      const name = localStorage.getItem("userName") || "Usuário";
+      const avatar = localStorage.getItem("userAvatar") || "default.png";
+
+      const nameEl = document.getElementById("userName");
+      const avatarEl = document.getElementById("userAvatar");
+
+      if (nameEl && avatarEl) {
+        nameEl.textContent = name;
+        avatarEl.src = avatar;
+      }
+    });
+  </script>
+
+</body>
+</html>
