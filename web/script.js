@@ -1,76 +1,53 @@
 import api from './api.js';
 
 const setUserHeader = user => {
-  const name = user.name || user.email || 'Usuário';
-  const avatar = user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}`;
-
-  document.getElementById('user-name').textContent = name;
-  document.getElementById('user-photo').src = avatar;
+  document.getElementById('user-name').textContent = user.name || user.email || 'Usuário';
+  document.getElementById('user-photo').src = user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'U')}`;
 };
 
 const jwtDecode = () => {
-  try {
-    const token = localStorage.getItem("token");
-    if (!token) throw new Error("Token não encontrado");
+  const token = localStorage.getItem('token').split('.')[1];
+  const user = JSON.parse(atob(token));
+  setUserHeader(user);
+  console.log(user);
+}
 
-    const payload = token.split(".")[1];
-    const user = JSON.parse(atob(payload));
+if (window.location.pathname.includes('home.html')) {
+  jwtDecode();
+}
 
-    console.log(user);
-
-    localStorage.setItem("userName", user.name || "Usuário");
-    localStorage.setItem("userAvatar", user.avatar || "");
-    setUserHeader(user);
-  } catch (error) {
-    console.error("Erro ao decodificar o token JWT:", error);
-  }
-};
-
-const login = (email, password) => {
+const getPosts = () =>{
   api
-    .post("/login", {
-      user: email,
-      psw: password
+  .get ('posts',{
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('token')}`
+    }
     })
-    .then(res => {
-      localStorage.setItem("token", res.data.token);
-      jwtDecode();
-      getPosts();
-      document.getElementById('message').innerHTML = '<div class="success">Login realizado com sucesso!</div>';
-      setTimeout(() => {
-        window.location.href = "home.html";
-      }, 1200);
-    })
-    .catch(err => {
-      console.error(err);
-      document.getElementById('message').innerHTML = '<div class="error">E-mail ou senha inválidos.</div>';
-    });
-};
+  .then (res =>{
+    console.log(res);
+  })
+  .catch(err => {
+    console.log(err)
+  })
+}
 
-const getPosts = () => {
-  api
-    .get("/posts", {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      }
-    })
-    .then(res => {
-      console.log(res.data);
-      // Aqui você pode fazer algo com os posts, como renderizá-los na tela
-    })
-    .catch(err => {
-      console.error("Erro ao buscar os posts:", err);
-    });
-};
 
 document.addEventListener('DOMContentLoaded', function () {
   const form = document.getElementById('loginForm');
-  if (form) {
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
-      login(email, password);
-    });
-  }
+  const messageDiv = document.getElementById('message');
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+
+    if (email === 'usuario@email.com' && password === '9692') {
+      messageDiv.innerHTML = '<div class="success">Login realizado com sucesso!</div>';
+      setTimeout(() => {
+        window.location.href = "home.html";
+      }, 1200);
+    } else {
+      messageDiv.innerHTML = '<div class="error">E-mail ou senha inválidos.</div>';
+    }
+  });
 });

@@ -7,8 +7,8 @@ const port = 3000;
 const loginRoutes = require('./src/routes/login');
 const postsRoutes = require('./src/routes/posts');
 
-app.use(express.json());
 app.use(cors());
+app.use(express.json());
 
 app.use(loginRoutes);
 app.use(postsRoutes);
